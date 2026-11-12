@@ -115,7 +115,6 @@ def play_game(name):
     # 플레이어가 승리하면 True
     return my_wins == GOAL_WINS
 
-
 # 게임의 전체 루프
 def main():
     show_title()
@@ -126,10 +125,10 @@ def main():
     while True:
         my_won = play_game(name)
         if my_won:
-            co_wins += 1 # 연승기록 누적
+            co_wins += 1    # 연승기록 누적
             print(f"\n현재 연승: {co_wins}연승")
         else:
-            co_wins = 0 # 연승기록 초기화
+            co_wins = 0     # 연승기록 초기화
 
         # if co_wins > 0:
         #     print(f"\n현재 연승: {co_wins}연승")
