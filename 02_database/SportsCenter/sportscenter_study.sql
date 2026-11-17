@@ -89,6 +89,80 @@ CREATE TABLE lockers
     asign_date  DATE    NOT NULL
 );
 
-
 INSERT INTO lockers VALUES (101, 1, '2026-11-01');
-INSERT INTO lockers VALUES (102, 3, '2026-11-01'); -- 임시회원
+
+-- 삭제 테스트를 위한 임시 회원 추가
+INSERT INTO members (name, gender, birth_year, join_date)
+VALUES ('임시회원', 'M', 2000, '2026-11-01');
+
+-- 임시 회원의 락커 배정
+INSERT INTO lockers VALUES (102, 3, '2026-11-01');
+
+-- 회원 삭제 시 사물함도 함께 삭제되는지 확인
+DELETE FROM members WHERE member_id = 3;
+
+-- 사물함이 삭제되어 있는지 확인
+SELECT * FROM lockers;
+
+-- 수강 신청 테이블
+CREATE TABLE enrollments
+(
+    member_id       INT             NOT NULL REFERENCES members (member_id),
+    course_id       INT             NOT NULL REFERENCES courses (course_id),
+    enroll_month    CHAR(7)         NOT NULL,
+    status          VARCHAR(10)     NOT NULL,
+    pay_amount      NUMERIC(10,2)    NOT NULL CHECK (pay_amount >=0),
+    PRIMARY KEY (member_id, course_id, enroll_month)
+);
+
+INSERT INTO enrollments 
+VALUES (1, 1, '2026-11', '수료', 50000);
+
+INSERT INTO enrollments 
+VALUES (2, 2, '2026-10', '수료', 70000);
+
+INSERT INTO enrollments 
+VALUES (2, 2, '2026-10', '수료', 60000);
+
+-- 강사 테이블
+DROP TABLE IF EXISTS instructor CASCADE;
+
+CREATE TABLE instructors
+(
+    instructor_id   SERIAL      PRIMARY KEY,
+    name            VARCHAR(20) NOT NULL,
+    sports_id       INT      NOT NULL REFERENCES sports (sports_id),
+    phone           VARCHAR(20),
+    hire_date       DATE        NOT NULL
+);
+
+INSERT INTO instructors (name, sports_id, phone, hire_date)
+VALUES 
+('홍길동', 1, '010-1234-1234', '2025-01-1'),
+('전우치', 2, '010-1234-5678', '2025-01-10');
+
+-- 테이블 수정 ALTER Table
+
+ALTER Table courses
+ADD COLUMN instructor_id INT REFERENCES instructor (instructor_id);
+
+
+SELECT course_name AS 강좌명,
+fee AS 수강료,
+fee * 3 AS "3개월치수강료"
+FROM courses
+LIMIT 5;
+
+SELECT DISTINCT region FROM members;
+
+SELECT DISTINCT sport_id, level FROM courses;
+
+SELECT * FROM members WHERE member_id <= 7;
+
+SELECT * FROM members WHERE region = '마포구';
+
+SELECT * FROM members WHERE email IS NULL;
+
+SELECT COUNT(*) AS "E-MAIL 미기재" FROM members WHERE email IS NULL;
+
+SELECT * FROM members WHERE birth_year BETWEEN 1995 AND 2000;
