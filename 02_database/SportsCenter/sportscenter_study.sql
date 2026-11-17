@@ -166,3 +166,7 @@ SELECT * FROM members WHERE email IS NULL;
 SELECT COUNT(*) AS "E-MAIL 미기재" FROM members WHERE email IS NULL;
 
 SELECT * FROM members WHERE birth_year BETWEEN 1995 AND 2000;
+
+SELECT * FROM courses WHERE course_id in (1, 5, 10);
+
+SELECT * FROM members WHERE name LIKE '김%';
