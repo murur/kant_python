@@ -170,3 +170,174 @@ SELECT * FROM members WHERE birth_year BETWEEN 1995 AND 2000;
 SELECT * FROM courses WHERE course_id in (1, 5, 10);
 
 SELECT * FROM members WHERE name LIKE '김%';
+
+SELECT course_name, level, start_time 
+FROM courses
+WHERE sport_id = 1
+AND (level = '초급' or start_time < '9:00');
+
+SELECT name, birth_year,
+        CASE WHEN birth_year <= 1960 THEN '할인'
+             WHEN birth_year >= 2000 THEN '청소년'
+             ELSE '일반'
+        END AS 요금구분
+FROM members
+ORDER BY birth_year, name 
+LIMIT 10;
+
+-- 수강료가 비싼 순서대로 정렬
+SELECT course_name, fee
+FROM courses
+WHERE fee >= 80000
+ORDER BY fee DESC, course_name;
+
+SELECT name, email
+FROM members
+ORDER BY email DESC, name;
+
+SELECT
+    COUNT(*)            AS 강좌수,
+    MIN(fee)            AS 최저수강료,
+    MAX(fee)            AS 최고수강료,
+    SUM(capacity)       AS 전체정원,
+    ROUND(AVG(fee), 2)  AS 평균수강료
+FROM courses;
+
+-- COUNT(*) vs COUNT(컬럼)
+
+SELECT
+    COUNT(*)                 AS 회원수,
+    COUNT(email)             AS 이메일있음,
+    COUNT(phone)             AS 전화번호있음,
+    COUNT(DISTINCT region)   AS 거주지
+FROM members;
+
+-- 최고 매출 SUM
+
+SELECT
+    COUNT(*)        AS 신청건수,
+    SUM(pay_amount) AS 매출,
+    MAX(pay_amount) AS 최고매출
+FROM enrollments
+WHERE enroll_month = '2026-11';
+
+SELECT
+    enroll_month        AS 신청월,
+    COUNT(*)            AS 신청건수,
+    SUM(pay_amount)     AS 매출
+FROM enrollments
+GROUP BY enroll_month
+ORDER BY enroll_month;
+
+SELECT
+    enroll_month, status, COUNT(*) AS 건수
+FROM enrollments
+GROUP BY enroll_month, status
+ORDER BY enroll_month, status;
+
+-- HAVING
+SELECT course_id, COUNT(*) AS 누적신청
+FROM enrollments
+WHERE status <> '취소'
+GROUP BY course_id
+HAVING COUNT(*) >= 18
+ORDER BY 누적신청 DESC, course_id;
+
+-- 출력 : 거주지, 해당거주지회원수
+-- 조건 : 해당 거주지 회원수 10명 이상인 경우
+
+SELECT region, COUNT(*) AS 회원수
+FROM members
+GROUP BY region
+HAVING COUNT(*) >= 10
+ORDER BY 회원수 DESC;
+
+-- UNION / UNION ALL
+
+SELECT member_id FROM enrollments WHERE course_id = 4 AND enroll_month = '2026-09'
+UNION
+SELECT member_id FROM enrollments WHERE course_id = 4 AND enroll_month = '2026-10'
+UNION
+SELECT member_id FROM enrollments WHERE course_id = 4 AND enroll_month = '2026-11'
+ORDER BY member_id;
+
+SELECT '강사' AS 구분, name, phone FROM instructors WHERE sport_id = 4
+UNION ALL 
+SELECT '회원' AS 구분, name, phone FROM members WHERE region = '영등포구';
+
+SELECT
+    e.member_id,
+    m.name,
+    c.course_name,
+    e.enroll_month,
+    e.status
+FROM enrollments e
+LEFT JOIN members m on e.member_id = m.member_id
+LEFT JOIN courses c on e.course_id = c.course_id
+WHERE e.course_id = 6 AND e.enroll_month = '2026-11'
+ORDER BY m.name;
+
+--
+SELECT
+    c.course_id,
+    c.course_name,
+    i.name AS 강사
+FROM courses c
+LEFT JOIN instructors i on c.instructor_id = i.instructor_id
+ORDER BY c.course_id;
+
+SELECT
+    c.course_id,
+    c.course_name,
+    i.name AS 강사
+FROM courses c
+FULL OUTER JOIN instructors i on c.instructor_id = i.instructor_id
+ORDER BY c.course_id;
+
+-- SUB QUERY
+
+SELECT AVG(fee) FROM courses;
+
+SELECT course_name, fee
+FROM courses
+WHERE fee > (SELECT AVG(fee) FROM courses)
+ORDER BY fee DESC, course_name;
+
+-- FROM Sub QUERY
+
+SELECT member_id, total_paid
+FROM 
+(
+    SELECT member_id, SUM(pay_amount) AS total_paid
+    FROM enrollments
+    GROUP BY member_id
+) AS paid
+WHERE total_paid >= 400000
+ORDER BY total_paid DESC, member_id;
+
+
+-- Inline VIEW
+SELECT 
+    paid.member_id  AS 회원번호,
+    m.name          AS 회원명,
+    paid.total_paid AS 매출액
+FROM 
+(
+    SELECT member_id, SUM(pay_amount) AS total_paid
+    FROM enrollments
+    GROUP BY member_id
+) AS paid
+LEFT JOIN members m on paid.member_id = m.member_id
+WHERE total_paid >= 400000
+ORDER BY paid.total_paid DESC, paid.member_id;
+
+-- Scala Sub QUERY
+
+SELECT
+    course_name,
+    fee,
+    ROUND((SELECT AVG(fee) FROM courses), 2)        AS 전체평균,
+    fee - ROUND((SELECT AVG(fee) FROM courses), 2)  AS 평균과차이
+FROM courses;
+
+\timing on
