@@ -82,3 +82,10 @@ RETURNING m.member_id, m.name;
 -- TRUNCATE
 -- DROP TABLE
 -- 위 세가지 개념은 알고 있어야 한다
+
+-- dh@gimdonghyeon-ui-MacBookAir SportsCenter % cd ..
+-- dh@gimdonghyeon-ui-MacBookAir 02_database % ls
+-- ShoppingCenter  SportsCenter    pg_lab
+-- dh@gimdonghyeon-ui-MacBookAir 02_database % mkdir sportscenter_app
+-- dh@gimdonghyeon-ui-MacBookAir 02_database % cd sportscenter_app 
+-- dh@gimdonghyeon-ui-MacBookAir sportscenter_app % code .

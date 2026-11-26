@@ -33,7 +33,7 @@ def enroll(conn, member_id, course_id):
    
     conn.execute(
       "INSERT INTO enrollments (member_id, course_id, enroll_month, status, pay_amount)"
-      "VALUES (%s, %s, %s, '수강중', %s)" , 
+      "VALUES (%s, %s, %s, '수강중',git %s)" , 
       (member_id, course_id, MONTH, fee)
    )
     print("수강신청 완료되었습니다.")
